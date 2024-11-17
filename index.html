@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Invaders Clone</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="game-container">
+    <div id="player"></div>
+    <div id="invaders-container"></div>
+    <div id="game-message" class="hidden"></div>
+  </div>
+  <div id="controls">
+    <button id="start-button">Iniciar</button>
+    <button id="restart-button">Reiniciar</button>
+    <button id="left-button">Esquerda</button>
+    <button id="right-button">Direita</button>
+    <button id="fire-button">Atirar</button>
+  </div>
+  <div id="scoreboard">
+    <p>Pontuação: <span id="score">0</span></p>
+    <p>Recorde: <span id="highscore">0</span></p>
+  </div>
+
+  <audio id="shoot-sound" src="assets/sounds/shoot.mp3"></audio>
+  <audio id="explosion-sound" src="assets/sounds/explosion.mp3"></audio>
+  <audio id="game-over-sound" src="assets/sounds/game-over.mp3"></audio>
+  <script src="script.js"></script>
+</body>
+</html>

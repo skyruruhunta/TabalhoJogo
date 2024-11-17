@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  background-color: #000;
+  color: #fff;
+}
+
+#game-container {
+  position: relative;
+  width: 400px;
+  height: 600px;
+  background-color: #111;
+  overflow: hidden;
+  border: 2px solid #fff;
+  margin-top: 20px;
+}
+
+#player {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-image: url('assets/images/player.png');
+  background-size: cover;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.invader {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-image: url('assets/images/invader.png');
+  background-size: cover;
+}
+
+.bullet {
+  position: absolute;
+  width: 5px;
+  height: 20px;
+  background-color: red;
+}
+
+#controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button {
+  font-size: 16px;
+  padding: 10px;
+  background-color: #222;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #444;
+}
+
+#scoreboard {
+  margin-top: 10px;
+}
+
+#game-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid #fff;
+  display: none;
+}
+
+.hidden {
+  display: none;
+}
