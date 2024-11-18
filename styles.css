@@ -144,28 +144,6 @@ button:active {
 }
 
 @media screen and (max-width: 500px) {
-  #controls {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  button {
-    width: 60px;
-    height: 60px;
-    font-size: 14px;
-  }
-
-  #fire-button {
-    width: 80px;
-    height: 80px;
-  }
-}
-
-@media screen and (max-width: 350px) {
-  #controls {
-    gap: 8px;
-  }
-
   button {
     width: 50px;
     height: 50px;
@@ -175,5 +153,9 @@ button:active {
   #fire-button {
     width: 70px;
     height: 70px;
+  }
+
+  #controls {
+    gap: 5px;
   }
 }
