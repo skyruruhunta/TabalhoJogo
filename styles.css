@@ -32,7 +32,6 @@ body {
   background-image: url('assets/images/player.png');
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
@@ -40,8 +39,8 @@ body {
 
 #instructions-box {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 10px;
+  left: 10px;
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 10px;
@@ -49,8 +48,10 @@ body {
   z-index: 1000;
 }
 
-#instructions-box.hidden {
-  display: none;
+#invaders-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .invader {
@@ -72,12 +73,15 @@ body {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 10px;
+}
+
+#scoreboard {
+  margin-top: 10px;
 }
 
 #controls {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   width: 100%;
@@ -88,14 +92,13 @@ body {
   position: fixed;
   bottom: 0;
   gap: 10px;
-  z-index: 10;
 }
 
 button {
-  font-size: 18px;
-  padding: 15px;
-  width: 70px;
-  height: 70px;
+  font-size: 16px;
+  padding: 10px;
+  width: 60px;
+  height: 60px;
   background-color: #222;
   color: #fff;
   border: 2px solid #fff;
@@ -104,7 +107,6 @@ button {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  outline: none;
 }
 
 button:hover {
@@ -117,12 +119,8 @@ button:active {
 
 #fire-button {
   background-color: red;
-  width: 90px;
-  height: 90px;
-}
-
-#scoreboard {
-  margin-top: 10px;
+  width: 70px;
+  height: 70px;
 }
 
 #game-message {
@@ -141,21 +139,4 @@ button:active {
 
 .hidden {
   display: none;
-}
-
-@media screen and (max-width: 500px) {
-  button {
-    width: 50px;
-    height: 50px;
-    font-size: 12px;
-  }
-
-  #fire-button {
-    width: 70px;
-    height: 70px;
-  }
-
-  #controls {
-    gap: 5px;
-  }
 }
