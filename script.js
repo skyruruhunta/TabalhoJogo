@@ -16,24 +16,24 @@ document.addEventListener("DOMContentLoaded", function () {
   highScoreDisplay.textContent = highScore;
 
   let playerPosition = 180;
-  const playerWidth = 30;
+  const playerWidth = 40;
   const gameWidth = 400;
   let invaderSpeed = 800;
   let invaderMovementInterval;
 
   const maxActiveBullets = 5;
+  let isGameRunning = false;
 
   function playSound(sound) {
     if (sound) {
       sound.currentTime = 0;
       sound.volume = 0.5;
-      sound.play().catch((error) => {
-        console.error(`Erro ao reproduzir som: ${error}`);
-      });
+      sound.play().catch(() => {});
     }
   }
 
   function movePlayer(direction) {
+    if (!isGameRunning) return;
     if (direction === "left" && playerPosition > 0) playerPosition -= 10;
     if (direction === "right" && playerPosition < gameWidth - playerWidth) playerPosition += 10;
     player.style.left = playerPosition + "px";
@@ -61,6 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     clearInterval(invaderMovementInterval);
     invaderMovementInterval = setInterval(() => {
+      if (!isGameRunning) return;
+
       moveDown = false;
 
       invaders.forEach((invader) => {
@@ -89,33 +91,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (invaders.length === 0) {
         spawnInvaders();
-        invaderSpeed = Math.max(200, invaderSpeed - 50);
       }
     }, invaderSpeed);
   }
 
   function fire() {
-    if (activeBullets.length >= maxActiveBullets) return;
+    if (!isGameRunning || activeBullets.length >= maxActiveBullets) return;
 
     playSound(shootSound);
 
     const bullet = document.createElement("div");
     bullet.classList.add("bullet");
-    bullet.style.left = playerPosition + 12 + "px";
-    bullet.style.bottom = "60px";
-    document.getElementById("game-container").appendChild(bullet);
 
+    const playerCenter = player.offsetLeft + player.offsetWidth / 2;
+    bullet.style.left = `${playerCenter - 2.5}px`;
+    bullet.style.bottom = "50px";
+
+    document.getElementById("game-container").appendChild(bullet);
     activeBullets.push(bullet);
 
     const bulletInterval = setInterval(() => {
       const bulletBottom = parseInt(bullet.style.bottom);
-      if (bulletBottom >= 600) {
+      if (bulletBottom >= 600 || !isGameRunning) {
         bullet.remove();
         activeBullets = activeBullets.filter((b) => b !== bullet);
         clearInterval(bulletInterval);
         return;
       }
-      bullet.style.bottom = bulletBottom + 5 + "px";
+      bullet.style.bottom = `${bulletBottom + 5}px`;
 
       invaders.forEach((invader) => {
         if (checkCollision(bullet, invader)) {
@@ -153,22 +156,31 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function startGame() {
+    isGameRunning = true;
     score = 0;
     scoreDisplay.textContent = score;
     gameMessage.classList.add("hidden");
     spawnInvaders();
   }
 
-  function endGame(message) {
-    playSound(gameOverSound);
-    clearInterval(invaderMovementInterval);
-    gameMessage.textContent = message;
-    gameMessage.classList.remove("hidden");
+  function resetGame() {
+    isGameRunning = true;
+    score = 0;
+    scoreDisplay.textContent = score;
+    gameMessage.classList.add("hidden");
+    spawnInvaders();
   }
 
-  document.getElementById("start-button").addEventListener("click", startGame);
-  document.getElementById("restart-button").addEventListener("click", startGame);
+  function pauseGame() {
+    isGameRunning = !isGameRunning;
+    gameMessage.textContent = isGameRunning ? "" : "Jogo Pausado";
+    gameMessage.classList.toggle("hidden", isGameRunning);
+  }
+
   document.getElementById("left-button").addEventListener("click", () => movePlayer("left"));
   document.getElementById("right-button").addEventListener("click", () => movePlayer("right"));
   document.getElementById("fire-button").addEventListener("click", fire);
+  document.getElementById("start-button").addEventListener("click", startGame);
+  document.getElementById("restart-button").addEventListener("click", resetGame);
+  document.getElementById("pause-button").addEventListener("click", pauseGame);
 });
