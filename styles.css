@@ -79,6 +79,7 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  flex-wrap: wrap;
   width: 100%;
   max-width: 400px;
   position: fixed;
@@ -86,6 +87,7 @@ body {
   padding: 10px;
   background: rgba(0, 0, 0, 0.8);
   border-radius: 10px;
+  gap: 10px;
 }
 
 button {
@@ -141,6 +143,11 @@ button:active {
 }
 
 @media screen and (max-width: 500px) {
+  #controls {
+    gap: 5px;
+    padding: 5px;
+  }
+
   button {
     width: 60px;
     height: 60px;
@@ -150,5 +157,23 @@ button:active {
   #fire-button {
     width: 80px;
     height: 80px;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  #controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  button {
+    width: 50px;
+    height: 50px;
+    font-size: 12px;
+  }
+
+  #fire-button {
+    width: 70px;
+    height: 70px;
   }
 }
