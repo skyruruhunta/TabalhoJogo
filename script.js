@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const scoreDisplay = document.getElementById("score");
   const highScoreDisplay = document.getElementById("highscore");
   const gameMessage = document.getElementById("game-message");
+
   const shootSound = document.getElementById("shoot-sound");
   const explosionSound = document.getElementById("explosion-sound");
   const gameOverSound = document.getElementById("game-over-sound");
@@ -156,3 +157,34 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     }, 20);
+  }
+
+  function startGame() {
+    isGameRunning = true;
+    score = 0;
+    scoreDisplay.textContent = score;
+    gameMessage.classList.add("hidden");
+    spawnInvaders();
+  }
+
+  function resetGame() {
+    isGameRunning = true;
+    score = 0;
+    scoreDisplay.textContent = score;
+    gameMessage.classList.add("hidden");
+    spawnInvaders();
+  }
+
+  document.getElementById("start-button").addEventListener("click", startGame);
+  document.getElementById("restart-button").addEventListener("click", resetGame);
+  document.getElementById("left-button").addEventListener("click", () => movePlayer("left"));
+  document.getElementById("right-button").addEventListener("click", () => movePlayer("right"));
+  document.getElementById("fire-button").addEventListener("click", fire);
+
+  window.addEventListener("keydown", (event) => {
+    if (!isGameRunning) return;
+    if (event.key === "ArrowLeft") movePlayer("left");
+    if (event.key === "ArrowRight") movePlayer("right");
+    if (event.key === " ") fire();
+  });
+});
