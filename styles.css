@@ -77,17 +77,18 @@ body {
 
 #controls {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
   flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   max-width: 400px;
-  position: fixed;
-  bottom: 20px;
   padding: 10px;
   background: rgba(0, 0, 0, 0.8);
   border-radius: 10px;
+  position: fixed;
+  bottom: 0;
   gap: 10px;
+  z-index: 10;
 }
 
 button {
@@ -144,8 +145,8 @@ button:active {
 
 @media screen and (max-width: 500px) {
   #controls {
-    gap: 5px;
-    padding: 5px;
+    flex-direction: column;
+    align-items: center;
   }
 
   button {
@@ -162,8 +163,7 @@ button:active {
 
 @media screen and (max-width: 350px) {
   #controls {
-    flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   button {
