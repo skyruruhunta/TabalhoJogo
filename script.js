@@ -4,10 +4,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const scoreDisplay = document.getElementById("score");
   const highScoreDisplay = document.getElementById("highscore");
   const gameMessage = document.getElementById("game-message");
+  const instructionsBox = document.getElementById("instructions-box");
 
   const shootSound = document.getElementById("shoot-sound");
   const explosionSound = document.getElementById("explosion-sound");
   const gameOverSound = document.getElementById("game-over-sound");
+
+  const startButton = document.getElementById("start-button");
+  const restartButton = document.getElementById("restart-button");
+  const pauseButton = document.getElementById("pause-button");
 
   let invaders = [];
   let activeBullets = [];
@@ -18,10 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
   let playerPosition = 180;
   const playerWidth = 40;
   const gameWidth = 400;
-  let invaderSpeed = 800;
+  let invaderSpeed = 800; 
   let invaderMovementInterval;
 
   const maxActiveBullets = 5;
+  const scoreThreshold = 50; 
+  const speedIncrement = 50; 
+  const minimumSpeed = 400; 
   let isGameRunning = false;
 
   function playSound(sound) {
@@ -76,7 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (moveDown) {
-        direction *= -1;
+        direction *= -1; 
+
         invaders.forEach((invader) => {
           const currentTop = parseInt(invader.style.top);
           invader.style.top = `${currentTop + 20}px`;
@@ -93,6 +102,13 @@ document.addEventListener("DOMContentLoaded", function () {
         spawnInvaders();
       }
     }, invaderSpeed);
+  }
+
+  function increaseDifficulty() {
+    if (score % scoreThreshold === 0 && invaderSpeed > minimumSpeed) {
+      invaderSpeed = Math.max(invaderSpeed - speedIncrement, minimumSpeed); // Reduz a velocidade gradualmente
+      moveInvaders();
+    }
   }
 
   function fire() {
@@ -131,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
           score += 10;
           scoreDisplay.textContent = score;
           updateHighScore();
+          increaseDifficulty();
         }
       });
     }, 20);
@@ -160,6 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
     score = 0;
     scoreDisplay.textContent = score;
     gameMessage.classList.add("hidden");
+    instructionsBox.classList.add("hidden"); 
     spawnInvaders();
   }
 
@@ -177,10 +195,28 @@ document.addEventListener("DOMContentLoaded", function () {
     gameMessage.classList.toggle("hidden", isGameRunning);
   }
 
+  document.addEventListener("keydown", (event) => {
+    if (!isGameRunning) return;
+
+    switch (event.key) {
+      case "ArrowLeft":
+        movePlayer("left");
+        break;
+      case "ArrowRight":
+        movePlayer("right");
+        break;
+      case " ":
+        event.preventDefault(); 
+        fire();
+        break;
+    }
+  });
+
   document.getElementById("left-button").addEventListener("click", () => movePlayer("left"));
   document.getElementById("right-button").addEventListener("click", () => movePlayer("right"));
   document.getElementById("fire-button").addEventListener("click", fire);
-  document.getElementById("start-button").addEventListener("click", startGame);
-  document.getElementById("restart-button").addEventListener("click", resetGame);
-  document.getElementById("pause-button").addEventListener("click", pauseGame);
+
+  startButton.addEventListener("click", startGame);
+  restartButton.addEventListener("click", resetGame);
+  pauseButton.addEventListener("click", pauseGame);
 });
