@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const scoreDisplay = document.getElementById("score");
   const highScoreDisplay = document.getElementById("highscore");
   const gameMessage = document.getElementById("game-message");
-
-  const shootSound = document.getElementById("shoot-sound");
-  const explosionSound = document.getElementById("explosion-sound");
-  const gameOverSound = document.getElementById("game-over-sound");
+  const instructionsBox = document.getElementById("instructions-box");
+  const startButton = document.getElementById("start-button");
+  const restartButton = document.getElementById("restart-button");
+  const pauseButton = document.getElementById("pause-button");
 
   let invaders = [];
   let activeBullets = [];
@@ -20,23 +20,32 @@ document.addEventListener("DOMContentLoaded", function () {
   const gameWidth = 400;
   let invaderSpeed = 800;
   let invaderMovementInterval;
-
-  const maxActiveBullets = 5;
   let isGameRunning = false;
 
-  function playSound(sound) {
-    if (sound) {
-      sound.currentTime = 0;
-      sound.volume = 0.5;
-      sound.play().catch(() => {});
+  document.addEventListener("touchstart", (e) => {
+    if (e.touches.length > 1) {
+      e.preventDefault();
     }
+  });
+
+  document.addEventListener("dblclick", (e) => {
+    e.preventDefault();
+  });
+
+  function playSound(sound) {
+    sound.currentTime = 0;
+    sound.volume = 0.5;
+    sound.play().catch(() => {});
   }
 
   function movePlayer(direction) {
     if (!isGameRunning) return;
-    if (direction === "left" && playerPosition > 0) playerPosition -= 10;
-    if (direction === "right" && playerPosition < gameWidth - playerWidth) playerPosition += 10;
-    player.style.left = playerPosition + "px";
+    if (direction === "left" && playerPosition > 0) {
+      playerPosition -= 10;
+    } else if (direction === "right" && playerPosition < gameWidth - playerWidth) {
+      playerPosition += 10;
+    }
+    player.style.left = `${playerPosition}px`;
   }
 
   function spawnInvaders() {
@@ -55,25 +64,6 @@ document.addEventListener("DOMContentLoaded", function () {
     moveInvaders();
   }
 
-  function checkCollision(element1, element2) {
-    const rect1 = element1.getBoundingClientRect();
-    const rect2 = element2.getBoundingClientRect();
-    return !(
-      rect1.top > rect2.bottom ||
-      rect1.bottom < rect2.top ||
-      rect1.right < rect2.left ||
-      rect1.left > rect2.right
-    );
-  }
-
-  function endGame(message) {
-    isGameRunning = false;
-    clearInterval(invaderMovementInterval);
-    gameMessage.textContent = message;
-    gameMessage.classList.remove("hidden");
-    playSound(gameOverSound);
-  }
-
   function moveInvaders() {
     let direction = 1;
     let moveDown = false;
@@ -83,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!isGameRunning) return;
 
       moveDown = false;
-
       invaders.forEach((invader) => {
         const currentLeft = parseInt(invader.style.left);
         const newLeft = currentLeft + 10 * direction;
@@ -99,31 +88,33 @@ document.addEventListener("DOMContentLoaded", function () {
         invaders.forEach((invader) => {
           const currentTop = parseInt(invader.style.top);
           invader.style.top = `${currentTop + 20}px`;
-
-          if (currentTop + 40 >= 550) {
-            endGame("Você perdeu! Os invasores chegaram ao fundo!");
-          } else if (checkCollision(invader, player)) {
-            endGame("Você perdeu! Um invasor colidiu com você!");
-          }
+          if (currentTop + 40 >= 550) endGame("Invasores alcançaram o fundo!");
+          if (checkCollision(invader, player)) endGame("Invasores colidiram com você!");
         });
       }
 
-      if (invaders.length === 0) {
-        spawnInvaders();
-      }
+      if (invaders.length === 0) spawnInvaders();
     }, invaderSpeed);
   }
 
-  function fire() {
-    if (!isGameRunning || activeBullets.length >= maxActiveBullets) return;
+  function increaseDifficulty() {
+    const baseSpeed = 800;
+    const maxSpeed = 200;
+    const speedStep = 50;
 
-    playSound(shootSound);
+    invaderSpeed = Math.max(baseSpeed - Math.floor(score / 50) * speedStep, maxSpeed);
+    clearInterval(invaderMovementInterval);
+    moveInvaders();
+  }
+
+  function fire() {
+    if (!isGameRunning) return;
+
+    playSound(document.getElementById("shoot-sound"));
 
     const bullet = document.createElement("div");
     bullet.classList.add("bullet");
-
-    const playerCenter = player.offsetLeft + player.offsetWidth / 2;
-    bullet.style.left = `${playerCenter - 2.5}px`;
+    bullet.style.left = `${player.offsetLeft + 20}px`;
     bullet.style.bottom = "50px";
 
     document.getElementById("game-container").appendChild(bullet);
@@ -131,60 +122,79 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const bulletInterval = setInterval(() => {
       const bulletBottom = parseInt(bullet.style.bottom);
-      if (bulletBottom >= 600 || !isGameRunning) {
-        bullet.remove();
-        activeBullets = activeBullets.filter((b) => b !== bullet);
-        clearInterval(bulletInterval);
-        return;
-      }
       bullet.style.bottom = `${bulletBottom + 5}px`;
 
       invaders.forEach((invader) => {
         if (checkCollision(bullet, invader)) {
-          playSound(explosionSound);
+          playSound(document.getElementById("explosion-sound"));
           bullet.remove();
           invader.remove();
           activeBullets = activeBullets.filter((b) => b !== bullet);
           invaders = invaders.filter((i) => i !== invader);
-          clearInterval(bulletInterval);
           score += 10;
           scoreDisplay.textContent = score;
-          if (score > highScore) {
-            highScore = score;
-            localStorage.setItem("highscore", highScore);
-            highScoreDisplay.textContent = highScore;
-          }
+          updateHighScore();
+          increaseDifficulty();
         }
       });
+
+      if (bulletBottom >= 600) {
+        bullet.remove();
+        activeBullets = activeBullets.filter((b) => b !== bullet);
+        clearInterval(bulletInterval);
+      }
     }, 20);
   }
 
-  function startGame() {
+  function checkCollision(el1, el2) {
+    const r1 = el1.getBoundingClientRect();
+    const r2 = el2.getBoundingClientRect();
+    return !(r1.top > r2.bottom || r1.bottom < r2.top || r1.right < r2.left || r1.left > r2.right);
+  }
+
+  function updateHighScore() {
+    if (score > highScore) {
+      highScore = score;
+      localStorage.setItem("highscore", highScore);
+      highScoreDisplay.textContent = highScore;
+    }
+  }
+
+  function endGame(message) {
+    isGameRunning = false;
+    clearInterval(invaderMovementInterval);
+    gameMessage.textContent = message;
+    gameMessage.classList.remove("hidden");
+    playSound(document.getElementById("game-over-sound"));
+  }
+
+  startButton.addEventListener("click", () => {
     isGameRunning = true;
     score = 0;
     scoreDisplay.textContent = score;
+    instructionsBox.classList.add("hidden");
     gameMessage.classList.add("hidden");
     spawnInvaders();
-  }
-
-  function resetGame() {
-    isGameRunning = true;
-    score = 0;
-    scoreDisplay.textContent = score;
-    gameMessage.classList.add("hidden");
-    spawnInvaders();
-  }
-
-  document.getElementById("start-button").addEventListener("click", startGame);
-  document.getElementById("restart-button").addEventListener("click", resetGame);
-  document.getElementById("left-button").addEventListener("click", () => movePlayer("left"));
-  document.getElementById("right-button").addEventListener("click", () => movePlayer("right"));
-  document.getElementById("fire-button").addEventListener("click", fire);
-
-  window.addEventListener("keydown", (event) => {
-    if (!isGameRunning) return;
-    if (event.key === "ArrowLeft") movePlayer("left");
-    if (event.key === "ArrowRight") movePlayer("right");
-    if (event.key === " ") fire();
   });
+
+  restartButton.addEventListener("click", () => location.reload());
+  pauseButton.addEventListener("click", () => (isGameRunning = !isGameRunning));
+
+  document.addEventListener("keydown", (e) => {
+    if (!isGameRunning) return;
+    if (e.key === "ArrowLeft") movePlayer("left");
+    if (e.key === "ArrowRight") movePlayer("right");
+    if (e.key === " ") {
+      e.preventDefault();
+      fire();
+    }
+  });
+
+  document.getElementById("left-button").addEventListener("touchstart", () => movePlayer("left"));
+  document.getElementById("right-button").addEventListener("touchstart", () => movePlayer("right"));
+  document.getElementById("fire-button").addEventListener("touchstart", fire);
+
+  document.getElementById("left-button").addEventListener("mousedown", () => movePlayer("left"));
+  document.getElementById("right-button").addEventListener("mousedown", () => movePlayer("right"));
+  document.getElementById("fire-button").addEventListener("mousedown", fire);
 });

@@ -7,29 +7,30 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div id="scoreboard">
+    <p>Pontuação: <span id="score">0</span></p>
+    <p>Recorde: <span id="highscore">0</span></p>
+  </div>
+
   <div id="game-container">
-    <div id="instructions-box">
-      <p><strong>Controles (Desktop):</strong></p>
-      <ul>
-        <li>←: Mover para a esquerda</li>
-        <li>→: Mover para a direita</li>
-        <li>Espaço: Atirar</li>
-      </ul>
-    </div>
     <div id="player"></div>
     <div id="invaders-container"></div>
     <div id="game-message" class="hidden"></div>
   </div>
 
-  <div id="top-controls">
-    <button id="start-button">Iniciar</button>
-    <button id="restart-button">Reiniciar</button>
-    <button id="pause-button">Pausar</button>
+  <div id="instructions-box">
+    <h2>Controles:</h2>
+    <ul>
+      <li><strong>←</strong>: Mover para a esquerda</li>
+      <li><strong>→</strong>: Mover para a direita</li>
+      <li><strong>Espaço</strong>: Disparar</li>
+    </ul>
   </div>
 
-  <div id="scoreboard">
-    <p>Pontuação: <span id="score">0</span></p>
-    <p>Recorde: <span id="highscore">0</span></p>
+  <div id="top-controls">
+    <button id="start-button" tabindex="-1">Iniciar</button>
+    <button id="restart-button">Reiniciar</button>
+    <button id="pause-button">Pausar</button>
   </div>
 
   <div id="controls">
