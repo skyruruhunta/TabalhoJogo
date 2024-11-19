@@ -8,19 +8,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const startButton = document.getElementById("start-button");
   const restartButton = document.getElementById("restart-button");
   const pauseButton = document.getElementById("pause-button");
-
   let invaders = [];
   let activeBullets = [];
   let score = 0;
   let highScore = localStorage.getItem("highscore") || 0;
   highScoreDisplay.textContent = highScore;
-
   let playerPosition = 180;
   const playerWidth = 40;
   const gameWidth = 400;
   let invaderSpeed = 800;
   let invaderMovementInterval;
   let isGameRunning = false;
+  let canShoot = true;
+  const fireCooldown = 500;
 
   document.addEventListener("touchstart", (e) => {
     if (e.touches.length > 1) {
@@ -67,35 +67,57 @@ document.addEventListener("DOMContentLoaded", function () {
   function moveInvaders() {
     let direction = 1;
     let moveDown = false;
-
+  
     clearInterval(invaderMovementInterval);
     invaderMovementInterval = setInterval(() => {
       if (!isGameRunning) return;
-
-      moveDown = false;
+  
+      let leftmost = Infinity;
+      let rightmost = -Infinity;
+  
       invaders.forEach((invader) => {
         const currentLeft = parseInt(invader.style.left);
         const newLeft = currentLeft + 10 * direction;
-        invader.style.left = `${newLeft}px`;
-
-        if (newLeft + 40 >= gameWidth || newLeft <= 0) {
-          moveDown = true;
+  
+        if (newLeft < leftmost) leftmost = newLeft;
+        if (newLeft + 40 > rightmost) rightmost = newLeft + 40;
+      });
+  
+      if (rightmost >= gameWidth && direction === 1) {
+        moveDown = true;
+        direction = -1;
+      } else if (leftmost <= 0 && direction === -1) {
+        moveDown = true;
+        direction = 1;
+      }
+  
+      invaders.forEach((invader) => {
+        const currentLeft = parseInt(invader.style.left);
+        const currentTop = parseInt(invader.style.top);
+  
+        invader.style.left = `${Math.min(Math.max(currentLeft + 10 * direction, 0), gameWidth - 40)}px`;
+  
+        if (moveDown) {
+          invader.style.top = `${currentTop + 20}px`;
+          if (currentTop + 40 >= 550) {
+            endGame("Invasores alcançaram o fundo!");
+          }
+          if (checkCollision(invader, player)) {
+            endGame("Invasores colidiram com você!");
+          }
         }
       });
-
+  
       if (moveDown) {
-        direction *= -1;
-        invaders.forEach((invader) => {
-          const currentTop = parseInt(invader.style.top);
-          invader.style.top = `${currentTop + 20}px`;
-          if (currentTop + 40 >= 550) endGame("Invasores alcançaram o fundo!");
-          if (checkCollision(invader, player)) endGame("Invasores colidiram com você!");
-        });
+        moveDown = false;
+        increaseDifficulty();
       }
-
-      if (invaders.length === 0) spawnInvaders();
+  
+      if (invaders.length === 0) {
+        spawnInvaders();
+      }
     }, invaderSpeed);
-  }
+  }  
 
   function increaseDifficulty() {
     const baseSpeed = 800;
@@ -103,12 +125,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const speedStep = 50;
 
     invaderSpeed = Math.max(baseSpeed - Math.floor(score / 50) * speedStep, maxSpeed);
+
     clearInterval(invaderMovementInterval);
     moveInvaders();
   }
 
   function fire() {
-    if (!isGameRunning) return;
+    if (!isGameRunning || !canShoot) return;
+    canShoot = false;
 
     playSound(document.getElementById("shoot-sound"));
 
@@ -144,6 +168,10 @@ document.addEventListener("DOMContentLoaded", function () {
         clearInterval(bulletInterval);
       }
     }, 20);
+
+    setTimeout(() => {
+      canShoot = true;
+    }, fireCooldown);
   }
 
   function checkCollision(el1, el2) {
@@ -193,7 +221,6 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("left-button").addEventListener("touchstart", () => movePlayer("left"));
   document.getElementById("right-button").addEventListener("touchstart", () => movePlayer("right"));
   document.getElementById("fire-button").addEventListener("touchstart", fire);
-
   document.getElementById("left-button").addEventListener("mousedown", () => movePlayer("left"));
   document.getElementById("right-button").addEventListener("mousedown", () => movePlayer("right"));
   document.getElementById("fire-button").addEventListener("mousedown", fire);
